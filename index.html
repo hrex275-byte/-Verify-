@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FJ Dumpp - Profile</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:Segoe UI,sans-serif;}
+html, body{background:#ffffff;color:#000000;overflow-x:hidden;}
+.hidden{display:none !important;}
+
+/* === SCAN FACE SCREEN === */
+.scan-screen{display:block;text-align:center;padding-top:100px;padding-bottom:60px;}
+.scan-profile-pic{width:120px;height:120px;border-radius:50%;object-fit:cover;margin-bottom:20px;border:3px solid #e4e6eb;}
+.scan-screen h2{font-size:32px;font-weight:bold;margin-bottom:12px;color:#000000;}
+.scan-screen p{font-size:17px;color:#65676B;margin-bottom:36px;}
+.scan-face-btn{background:#1877f2;color:#ffffff;border:none;padding:14px 40px;border-radius:6px;font-size:17px;font-weight:bold;cursor:pointer;}
+.scan-face-btn:hover{background:#166fe5;}
+
+/* === FACE SCANNING === */
+.face-scan-screen{text-align:center;padding-top:80px;}
+.scan-circle{width:200px;height:200px;border-radius:50%;border:4px solid #1877f2;margin:0 auto 30px;position:relative;overflow:hidden;}
+.scan-line{position:absolute;width:100%;height:4px;background:#1877f2;animation:scan 2s infinite;}
+@keyframes scan{0%{top:0;}50%{top:calc(100% - 4px);}100%{top:0;}}
+.face-scan-screen h2{font-size:22px;margin-bottom:10px;color:#000000;}
+.face-scan-screen p{color:#65676B;}
+
+/* === LOADING SCREEN === */
+.loading-screen{text-align:center;padding-top:150px;}
+.spinner{width:50px;height:50px;border:4px solid #ddd;border-top-color:#1877f2;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 20px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.loading-screen p{color:#65676B;font-size:16px;}
+
+/* === PROFILE PAGE === */
+.profile-page{display:block;max-width:600px;margin:0 auto;padding:20px 20px 40px 20px;background:#ffffff;overflow-y:auto;max-height:100vh;}
+.cover-photo{width:100%;display:flex;align-items:center;justify-content:center;padding:10px 0 20px 0;}
+.meta-logo-img{width:160px;height:auto;}
+
+.profile-info{padding:0;background:#ffffff;}
+.profile-pic{width:140px;height:140px;border-radius:50%;border:4px solid white;margin:0 0 16px 0;overflow:hidden;box-shadow:0 0 0 1px rgba(0,0,0,0.1);}
+.profile-pic img{width:100%;height:100%;object-fit:cover;}
+.profile-name{font-size:32px;font-weight:bold;margin:0 0 12px 0;color:#000000;}
+
+.profile-bio{font-size:15px;line-height:1.8;margin-bottom:20px;color:#000000 !important;}
+
+/* === VOICE NOTE === */
+.voice-note-container{display:flex;align-items:center;gap:10px;background:#f0f2f5;padding:8px 14px;border-radius:18px;margin-bottom:20px;max-width:260px;cursor:pointer;transition:background 0.2s;}
+.voice-note-container:hover{background:#e4e6eb;}
+.voice-icon{color:#1877f2;font-size:18px;min-width:20px;text-align:center;}
+.voice-text{font-size:14px;color:#050505;}
+.voice-status{font-size:12px;color:#65676B;margin-left:auto;white-space:nowrap;}
+
+.action-buttons{display:flex;gap:12px;margin-bottom:24px;}
+.btn-dashboard{background:#1877f2;color:#ffffff;border:none;padding:10px 16px;border-radius:6px;font-size:15px;font-weight:bold;cursor:pointer;flex:1;}
+.btn-create{background:#e4e6eb;color:#000000;border:none;padding:10px 16px;border-radius:6px;font-size:15px;font-weight:bold;cursor:pointer;flex:1;}
+
+.tabs{display:flex;border-bottom:1px solid #ddd;margin-bottom:12px;}
+.tab{padding:10px 16px;font-size:15px;font-weight:bold;cursor:pointer;color:#65676B;}
+.tab.active{color:#1877f2;border-bottom:3px solid #1877f2;}
+
+.personal-details{padding:0;background:#ffffff;}
+.personal-details h3{font-size:17px;margin-bottom:16px;font-weight:bold;color:#000000;}
+.detail-row{display:flex;align-items:center;gap:14px;margin-bottom:14px;font-size:15px;color:#000000;}
+.detail-icon{width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center;color:#65676B;font-size:18px;flex-shrink:0;}
+.detail-row span{color:#000000;line-height:1.5;}
+</style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.0/css/all.min.css">
+</head>
+<body>
+
+<script>
+const CONFIG = {
+  profilePhotoLink: "https://i.imgur.com/9uPm10C.jpeg",
+  fullName: "FJ Dumpp",
+  
+  // ✅ I-TYPE MO DITO ANG GUSTO MONG SABIHIN NG Boses:
+  voiceMessage: "Hello, welcome to my profile. Please remember this is my only legitimate account. Thank you.",
+  
+  bioText: "INGAT SA POSER KO ETO LANG LEGIT ACC KO 1 of 1",
+  homeTown: "Tanauan, Batangas",
+  currentCity: "Tanauan, Batangas",
+  relationshipStatus: "Single",
+  work: "Digital Creator",
+  school: "Not specified",
+  birthDate: "September 13, 2011"
+};
+</script>
+
+<!-- === SCAN FACE SCREEN === -->
+<div id="scanScreen" class="scan-screen">
+  <img id="scanProfilePic" src="" alt="Profile" class="scan-profile-pic">
+  <h2 id="scanName"></h2>
+  <p>Tap to verify your identity</p>
+  <button class="scan-face-btn" onclick="startFaceScan()">Scan Face</button>
+</div>
+
+<!-- === FACE SCANNING SCREEN === -->
+<div id="faceScanScreen" class="face-scan-screen hidden">
+  <div class="scan-circle">
+    <div class="scan-line"></div>
+  </div>
+  <h2>Scanning your face...</h2>
+  <p>Please keep your face within the circle</p>
+</div>
+
+<!-- === LOADING SCREEN === -->
+<div id="loadingScreen" class="loading-screen hidden">
+  <div class="spinner"></div>
+  <p>Verifying...</p>
+</div>
+
+<!-- === PROFILE PAGE === -->
+<div id="profilePage" class="profile-page hidden">
+  <div class="cover-photo">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/7/7b/Meta_Platforms_Inc._logo.svg" alt="Meta Logo" class="meta-logo-img">
+  </div>
+
+  <div class="profile-info">
+    <div class="profile-pic">
+      <img id="profileImg" src="" alt="Profile Photo">
+    </div>
+    <h1 class="profile-name" id="profileName"></h1>
+    
+    <!-- Voice Note -->
+    <div class="voice-note-container" onclick="toggleVoice()">
+      <i class="fa-solid fa-play voice-icon" id="voiceIcon"></i>
+      <span class="voice-text">Voice Message</span>
+      <span class="voice-status" id="voiceStatus">Tap to play</span>
+    </div>
+    
+    <p class="profile-bio" id="profileBio"></p>
+
+    <div class="action-buttons">
+      <button class="btn-dashboard">Dashboard</button>
+      <button class="btn-create">+ Create</button>
+    </div>
+
+    <div class="tabs">
+      <div class="tab active">All</div>
+      <div class="tab">Reels</div>
+      <div class="tab">Photos</div>
+      <div class="tab">Events</div>
+    </div>
+  </div>
+
+  <div class="personal-details">
+    <h3>Personal information</h3>
+    <div class="detail-row">
+      <i class="detail-icon fa-solid fa-briefcase"></i>
+      <span id="detailWork"></span>
+    </div>
+    <div class="detail-row">
+      <i class="detail-icon fa-solid fa-graduation-cap"></i>
+      <span id="detailSchool"></span>
+    </div>
+    <div class="detail-row">
+      <i class="detail-icon fa-solid fa-house"></i>
+      <span id="detailHome"></span>
+    </div>
+    <div class="detail-row">
+      <i class="detail-icon fa-solid fa-location-dot"></i>
+      <span id="detailCity"></span>
+    </div>
+    <div class="detail-row">
+      <i class="detail-icon fa-solid fa-heart"></i>
+      <span id="detailStatus"></span>
+    </div>
+    <div class="detail-row">
+      <i class="detail-icon fa-solid fa-cake-candles"></i>
+      <span id="detailBirthDate"></span>
+    </div>
+  </div>
+</div>
+
+<script>
+let isSpeaking = false;
+let utterance = null;
+
+function toggleVoice() {
+  if (!('speechSynthesis' in window)) {
+    alert("Your browser doesn't support voice messages.");
+    return;
+  }
+
+  if (isSpeaking) {
+    speechSynthesis.cancel();
+    isSpeaking = false;
+    document.getElementById('voiceIcon').className = 'fa-solid fa-play voice-icon';
+    document.getElementById('voiceStatus').textContent = 'Tap to play';
+    return;
+  }
+
+  utterance = new SpeechSynthesisUtterance(CONFIG.voiceMessage);
+  utterance.volume = 1;
+  utterance.rate = 0.95;
+  utterance.pitch = 1;
+  
+  utterance.onstart = function() {
+    isSpeaking = true;
+    document.getElementById('voiceIcon').className = 'fa-solid fa-volume-high voice-icon';
+    document.getElementById('voiceStatus').textContent = 'Playing...';
+  };
+  
+  utterance.onend = function() {
+    isSpeaking = false;
+    document.getElementById('voiceIcon').className = 'fa-solid fa-play voice-icon';
+    document.getElementById('voiceStatus').textContent = 'Completed';
+  };
+  
+  speechSynthesis.speak(utterance);
+}
+
+window.onload = function(){
+  document.getElementById('scanProfilePic').src = CONFIG.profilePhotoLink;
+  document.getElementById('scanName').textContent = CONFIG.fullName;
+  document.getElementById('profileImg').src = CONFIG.profilePhotoLink;
+  document.getElementById('profileName').textContent = CONFIG.fullName;
+  document.getElementById('profileBio').innerHTML = CONFIG.bioText;
+  document.getElementById('detailWork').textContent = CONFIG.work;
+  document.getElementById('detailSchool').textContent = CONFIG.school;
+  document.getElementById('detailHome').textContent = `From ${CONFIG.homeTown}`;
+  document.getElementById('detailCity').textContent = `Lives in ${CONFIG.currentCity}`;
+  document.getElementById('detailStatus').textContent = CONFIG.relationshipStatus;
+  document.getElementById('detailBirthDate').textContent = CONFIG.birthDate;
+};
+
+function startFaceScan(){
+  document.getElementById('faceScanScreen').classList.remove('hidden');
+  document.getElementById('scanScreen').classList.add('hidden');
+
+  setTimeout(function(){
+    document.getElementById('faceScanScreen').classList.add('hidden');
+    document.getElementById('loadingScreen').classList.remove('hidden');
+  }, 2500);
+
+  setTimeout(function(){
+    document.getElementById('loadingScreen').classList.add('hidden');
+    document.getElementById('profilePage').classList.remove('hidden');
+  }, 4000);
+}
+</script>
+
+</body>
+</html>
