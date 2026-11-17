@@ -24,8 +24,6 @@ html, body{background:#ffffff;color:#000000;overflow-x:hidden;}
 @keyframes scan{0%{top:0;}50%{top:calc(100% - 4px);}100%{top:0;}}
 .face-scan-screen h2{font-size:22px;margin-bottom:10px;color:#000000;}
 .face-scan-screen p{color:#65676B;}
-.camera-preview{width:200px;height:150px;border-radius:8px;background:#f0f2f5;margin:0 auto 20px;overflow:hidden;border:2px solid #1877f2;}
-.camera-preview video{width:100%;height:100%;object-fit:cover;}
 
 /* === LOADING SCREEN === */
 .loading-screen{text-align:center;padding-top:150px;}
@@ -46,9 +44,6 @@ html, body{background:#ffffff;color:#000000;overflow-x:hidden;}
 .profile-bio{font-size:15px;line-height:1.8;margin-bottom:20px;color:#000000 !important;}
 
 /* === VOICE NOTE === */
-.show-voice-btn{background:#f0f2f5;border:none;padding:8px 16px;border-radius:18px;font-size:14px;color:#1877f2;cursor:pointer;margin-bottom:20px;display:inline-flex;align-items:center;gap:6px;}
-.show-voice-btn:hover{background:#e4e6eb;}
-
 .voice-note-container{display:flex;align-items:center;gap:10px;background:#f0f2f5;padding:8px 14px;border-radius:18px;margin-bottom:20px;max-width:260px;cursor:pointer;transition:background 0.2s;}
 .voice-note-container:hover{background:#e4e6eb;}
 .voice-icon{color:#1877f2;font-size:18px;min-width:20px;text-align:center;}
@@ -98,8 +93,8 @@ const CONFIG = {
 
 <!-- === FACE SCANNING SCREEN === -->
 <div id="faceScanScreen" class="face-scan-screen hidden">
-  <div class="camera-preview">
-    <video id="cameraFeed" autoplay muted playsinline></video>
+  <div class="scan-circle">
+    <div class="scan-line"></div>
   </div>
   <h2>Scanning your face...</h2>
   <p>Please keep your face within the circle</p>
@@ -123,13 +118,8 @@ const CONFIG = {
     </div>
     <h1 class="profile-name" id="profileName"></h1>
     
-    <!-- Voice Message Button - Nakatago sa simula -->
-    <button class="show-voice-btn" id="showVoiceBtn" onclick="showVoiceNote()">
-      <i class="fa-solid fa-microphone"></i> Show Voice Message
-    </button>
-    
-    <!-- Voice Note - Nakatago sa simula -->
-    <div class="voice-note-container hidden" id="voiceNoteBox" onclick="toggleVoice()">
+    <!-- Voice Note -->
+    <div class="voice-note-container" onclick="toggleVoice()" id="voiceNoteBox">
       <i class="fa-solid fa-play voice-icon" id="voiceIcon"></i>
       <span class="voice-text">Voice Message</span>
       <span class="voice-status" id="voiceStatus">Tap to play</span>
@@ -183,12 +173,6 @@ const CONFIG = {
 let isSpeaking = false;
 let utterance = null;
 
-// Show voice note when button is clicked
-function showVoiceNote() {
-  document.getElementById('showVoiceBtn').classList.add('hidden');
-  document.getElementById('voiceNoteBox').classList.remove('hidden');
-}
-
 function tryPlayVoice() {
   if (!('speechSynthesis' in window) || isSpeaking) return;
   
@@ -229,20 +213,6 @@ function toggleVoice() {
   tryPlayVoice();
 }
 
-// Start camera
-async function startCamera() {
-  try {
-    const stream = await navigator.mediaDevices.getUserMedia({ 
-      video: { facingMode: 'user' },
-      audio: false 
-    });
-    const videoElement = document.getElementById('cameraFeed');
-    videoElement.srcObject = stream;
-  } catch (err) {
-    console.log('Camera access denied or not available');
-  }
-}
-
 window.onload = function(){
   document.getElementById('scanProfilePic').src = CONFIG.profilePhotoLink;
   document.getElementById('scanName').textContent = CONFIG.fullName;
@@ -256,13 +226,10 @@ window.onload = function(){
   document.getElementById('detailStatus').textContent = CONFIG.relationshipStatus;
   document.getElementById('detailBirthDate').textContent = CONFIG.birthDate;
   
-  // Scan Face button click
+  // Simulate scan face button click
   document.getElementById('scanFaceBtn').addEventListener('click', function() {
     document.getElementById('scanScreen').classList.add('hidden');
     document.getElementById('faceScanScreen').classList.remove('hidden');
-    
-    // Start camera when face scanning starts
-    startCamera();
     
     setTimeout(function() {
       document.getElementById('faceScanScreen').classList.add('hidden');
@@ -272,6 +239,11 @@ window.onload = function(){
     setTimeout(function() {
       document.getElementById('loadingScreen').classList.add('hidden');
       document.getElementById('profilePage').classList.remove('hidden');
+      
+      // Dahil pinindot na ang button, susubukan agad mag-play ang boses
+      setTimeout(() => {
+        tryPlayVoice();
+      }, 500);
     }, 4000);
   });
 };
