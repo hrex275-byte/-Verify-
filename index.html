@@ -72,10 +72,7 @@ html, body{background:#ffffff;color:#000000;overflow-x:hidden;}
 const CONFIG = {
   profilePhotoLink: "https://i.imgur.com/9uPm10C.jpeg",
   fullName: "FJ Dumpp",
-  
-  // ✅ I-TYPE MO DITO ANG GUSTO MONG SABIHIN NG Boses:
-  voiceMessage: "Hello, welcome to my profile. Please remember this is my only legitimate account. Thank you.",
-  
+  voiceMessage: "Welcome to my profile. Please remember this is my only legitimate account. Stay safe everyone.",
   bioText: "INGAT SA POSER KO ETO LANG LEGIT ACC KO 1 of 1",
   homeTown: "Tanauan, Batangas",
   currentCity: "Tanauan, Batangas",
@@ -91,7 +88,7 @@ const CONFIG = {
   <img id="scanProfilePic" src="" alt="Profile" class="scan-profile-pic">
   <h2 id="scanName"></h2>
   <p>Tap to verify your identity</p>
-  <button class="scan-face-btn" onclick="startFaceScan()">Scan Face</button>
+  <button class="scan-face-btn" id="scanFaceBtn">Scan Face</button>
 </div>
 
 <!-- === FACE SCANNING SCREEN === -->
@@ -122,7 +119,7 @@ const CONFIG = {
     <h1 class="profile-name" id="profileName"></h1>
     
     <!-- Voice Note -->
-    <div class="voice-note-container" onclick="toggleVoice()">
+    <div class="voice-note-container" onclick="toggleVoice()" id="voiceNoteBox">
       <i class="fa-solid fa-play voice-icon" id="voiceIcon"></i>
       <span class="voice-text">Voice Message</span>
       <span class="voice-status" id="voiceStatus">Tap to play</span>
@@ -176,20 +173,9 @@ const CONFIG = {
 let isSpeaking = false;
 let utterance = null;
 
-function toggleVoice() {
-  if (!('speechSynthesis' in window)) {
-    alert("Your browser doesn't support voice messages.");
-    return;
-  }
-
-  if (isSpeaking) {
-    speechSynthesis.cancel();
-    isSpeaking = false;
-    document.getElementById('voiceIcon').className = 'fa-solid fa-play voice-icon';
-    document.getElementById('voiceStatus').textContent = 'Tap to play';
-    return;
-  }
-
+function tryPlayVoice() {
+  if (!('speechSynthesis' in window) || isSpeaking) return;
+  
   utterance = new SpeechSynthesisUtterance(CONFIG.voiceMessage);
   utterance.volume = 1;
   utterance.rate = 0.95;
@@ -210,6 +196,23 @@ function toggleVoice() {
   speechSynthesis.speak(utterance);
 }
 
+function toggleVoice() {
+  if (!('speechSynthesis' in window)) {
+    alert("Your browser doesn't support voice messages.");
+    return;
+  }
+
+  if (isSpeaking) {
+    speechSynthesis.cancel();
+    isSpeaking = false;
+    document.getElementById('voiceIcon').className = 'fa-solid fa-play voice-icon';
+    document.getElementById('voiceStatus').textContent = 'Tap to play';
+    return;
+  }
+  
+  tryPlayVoice();
+}
+
 window.onload = function(){
   document.getElementById('scanProfilePic').src = CONFIG.profilePhotoLink;
   document.getElementById('scanName').textContent = CONFIG.fullName;
@@ -222,22 +225,28 @@ window.onload = function(){
   document.getElementById('detailCity').textContent = `Lives in ${CONFIG.currentCity}`;
   document.getElementById('detailStatus').textContent = CONFIG.relationshipStatus;
   document.getElementById('detailBirthDate').textContent = CONFIG.birthDate;
+  
+  // Simulate scan face button click
+  document.getElementById('scanFaceBtn').addEventListener('click', function() {
+    document.getElementById('scanScreen').classList.add('hidden');
+    document.getElementById('faceScanScreen').classList.remove('hidden');
+    
+    setTimeout(function() {
+      document.getElementById('faceScanScreen').classList.add('hidden');
+      document.getElementById('loadingScreen').classList.remove('hidden');
+    }, 2500);
+    
+    setTimeout(function() {
+      document.getElementById('loadingScreen').classList.add('hidden');
+      document.getElementById('profilePage').classList.remove('hidden');
+      
+      // Dahil pinindot na ang button, susubukan agad mag-play ang boses
+      setTimeout(() => {
+        tryPlayVoice();
+      }, 500);
+    }, 4000);
+  });
 };
-
-function startFaceScan(){
-  document.getElementById('faceScanScreen').classList.remove('hidden');
-  document.getElementById('scanScreen').classList.add('hidden');
-
-  setTimeout(function(){
-    document.getElementById('faceScanScreen').classList.add('hidden');
-    document.getElementById('loadingScreen').classList.remove('hidden');
-  }, 2500);
-
-  setTimeout(function(){
-    document.getElementById('loadingScreen').classList.add('hidden');
-    document.getElementById('profilePage').classList.remove('hidden');
-  }, 4000);
-}
 </script>
 
 </body>
