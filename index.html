@@ -17,14 +17,13 @@ html, body{background:#ffffff;color:#000000;overflow-x:hidden;}
 .scan-face-btn{background:#1877f2;color:#ffffff;border:none;padding:14px 40px;border-radius:6px;font-size:17px;font-weight:bold;cursor:pointer;}
 .scan-face-btn:hover{background:#166fe5;}
 
-/* === FACE SCANNING === */
+/* === FACE SCANNING — BILOG NA LANG ANG MAY CAMERA === */
 .face-scan-screen{text-align:center;padding-top:80px;}
-.camera-preview{width:240px;height:180px;border-radius:8px;background:#f0f2f5;margin:0 auto 20px;overflow:hidden;border:2px solid #1877f2;}
-.camera-preview video{width:100%;height:100%;object-fit:cover;transform:scaleX(-1);}
-.scan-circle{width:200px;height:200px;border-radius:50%;border:4px solid #1877f2;margin:0 auto 30px;position:relative;overflow:hidden;}
-.scan-line{position:absolute;width:100%;height:4px;background:#1877f2;animation:scan 2s infinite;}
+.camera-circle{width:240px;height:240px;border-radius:50%;border:4px solid #1877f2;margin:0 auto;position:relative;overflow:hidden;}
+.camera-circle video{width:100%;height:100%;object-fit:cover;transform:scaleX(-1);}
+.scan-line{position:absolute;width:100%;height:4px;background:#1877f2;animation:scan 2s infinite;left:0;}
 @keyframes scan{0%{top:0;}50%{top:calc(100% - 4px);}100%{top:0;}}
-.face-scan-screen h2{font-size:22px;margin-bottom:10px;color:#000000;}
+.face-scan-screen h2{font-size:22px;margin-top:30px;margin-bottom:10px;color:#000000;}
 .face-scan-screen p{color:#65676B;}
 
 /* === LOADING SCREEN === */
@@ -93,16 +92,14 @@ const CONFIG = {
   <button class="scan-face-btn" id="scanFaceBtn">Scan Face</button>
 </div>
 
-<!-- === FACE SCANNING SCREEN === -->
+<!-- === FACE SCANNING SCREEN — BILOG NA LANG === -->
 <div id="faceScanScreen" class="face-scan-screen hidden">
-  <div class="camera-preview">
+  <div class="camera-circle">
     <video id="cameraFeed" autoplay muted playsinline></video>
-  </div>
-  <div class="scan-circle">
     <div class="scan-line"></div>
   </div>
   <h2>Scanning your face...</h2>
-  <p>Please keep your face within the frame</p>
+  <p>Please keep your face within the circle</p>
 </div>
 
 <!-- === LOADING SCREEN === -->
@@ -123,8 +120,8 @@ const CONFIG = {
     </div>
     <h1 class="profile-name" id="profileName"></h1>
     
-    <!-- Voice Note -->
-    <div class="voice-note-container" onclick="toggleVoice()" id="voiceNoteBox">
+    <!-- Voice Note — NANDITO AT MAG-AUTO-PLAY -->
+    <div class="voice-note-container" id="voiceNoteBox" onclick="toggleVoice()">
       <i class="fa-solid fa-play voice-icon" id="voiceIcon"></i>
       <span class="voice-text">Voice Message</span>
       <span class="voice-status" id="voiceStatus">Tap to play</span>
@@ -179,40 +176,24 @@ let isSpeaking = false;
 let utterance = null;
 let cameraStream = null;
 
-// 📷 START CAMERA — Hihingi ng permission kapag nasa GitHub Pages
+// 📷 START CAMERA
 async function startCamera() {
   try {
     cameraStream = await navigator.mediaDevices.getUserMedia({ 
-      video: { 
-        facingMode: 'user',
-        width: { ideal: 320 },
-        height: { ideal: 240 }
-      },
+      video: { facingMode: 'user', width: { ideal: 320 }, height: { ideal: 320 } },
       audio: false 
     });
-    
-    const videoElement = document.getElementById('cameraFeed');
-    videoElement.srcObject = cameraStream;
-    console.log('✅ Camera started');
-    
+    document.getElementById('cameraFeed').srcObject = cameraStream;
   } catch (err) {
-    console.error('❌ Camera error:', err.name, err.message);
-    if (err.name === 'NotAllowedError') {
-      alert("Please click 'Allow' when prompted for camera access.");
-    } else if (err.name === 'NotFoundError') {
-      alert("No camera found.");
-    }
+    console.log('Camera:', err.name);
   }
 }
 
-// Itigil ang camera
 function stopCamera() {
-  if (cameraStream) {
-    cameraStream.getTracks().forEach(track => track.stop());
-    cameraStream = null;
-  }
+  if (cameraStream) { cameraStream.getTracks().forEach(t => t.stop()); cameraStream = null; }
 }
 
+// 🔊 AUTO-PLAY VOICE — TATAWAGIN ITO PAGDATING SA PROFILE
 function tryPlayVoice() {
   if (!('speechSynthesis' in window) || isSpeaking) return;
   
@@ -271,8 +252,7 @@ window.onload = function(){
     document.getElementById('scanScreen').classList.add('hidden');
     document.getElementById('faceScanScreen').classList.remove('hidden');
     
-    // 📷 Hihingi ng camera permission — GAGANA SA GITHUB PAGES
-    startCamera();
+    startCamera(); // 📷 Bubukas ang camera sa loob ng BILOG
     
     setTimeout(function() {
       document.getElementById('faceScanScreen').classList.add('hidden');
@@ -284,10 +264,10 @@ window.onload = function(){
       document.getElementById('profilePage').classList.remove('hidden');
       stopCamera();
       
-      // 🔊 Subukan mag-play ng boses
+      // 🔊 AUTO-PLAY — PAGDATING SA PROFILE, MAGSASALITA AGAD
       setTimeout(() => {
         tryPlayVoice();
-      }, 500);
+      }, 600);
     }, 4000);
   });
 };
