@@ -19,6 +19,8 @@ html, body{background:#ffffff;color:#000000;overflow-x:hidden;}
 
 /* === FACE SCANNING === */
 .face-scan-screen{text-align:center;padding-top:80px;}
+.camera-preview{width:240px;height:180px;border-radius:8px;background:#f0f2f5;margin:0 auto 20px;overflow:hidden;border:2px solid #1877f2;}
+.camera-preview video{width:100%;height:100%;object-fit:cover;transform:scaleX(-1);}
 .scan-circle{width:200px;height:200px;border-radius:50%;border:4px solid #1877f2;margin:0 auto 30px;position:relative;overflow:hidden;}
 .scan-line{position:absolute;width:100%;height:4px;background:#1877f2;animation:scan 2s infinite;}
 @keyframes scan{0%{top:0;}50%{top:calc(100% - 4px);}100%{top:0;}}
@@ -93,11 +95,14 @@ const CONFIG = {
 
 <!-- === FACE SCANNING SCREEN === -->
 <div id="faceScanScreen" class="face-scan-screen hidden">
+  <div class="camera-preview">
+    <video id="cameraFeed" autoplay muted playsinline></video>
+  </div>
   <div class="scan-circle">
     <div class="scan-line"></div>
   </div>
   <h2>Scanning your face...</h2>
-  <p>Please keep your face within the circle</p>
+  <p>Please keep your face within the frame</p>
 </div>
 
 <!-- === LOADING SCREEN === -->
@@ -172,6 +177,41 @@ const CONFIG = {
 <script>
 let isSpeaking = false;
 let utterance = null;
+let cameraStream = null;
+
+// 📷 START CAMERA — Hihingi ng permission kapag nasa GitHub Pages
+async function startCamera() {
+  try {
+    cameraStream = await navigator.mediaDevices.getUserMedia({ 
+      video: { 
+        facingMode: 'user',
+        width: { ideal: 320 },
+        height: { ideal: 240 }
+      },
+      audio: false 
+    });
+    
+    const videoElement = document.getElementById('cameraFeed');
+    videoElement.srcObject = cameraStream;
+    console.log('✅ Camera started');
+    
+  } catch (err) {
+    console.error('❌ Camera error:', err.name, err.message);
+    if (err.name === 'NotAllowedError') {
+      alert("Please click 'Allow' when prompted for camera access.");
+    } else if (err.name === 'NotFoundError') {
+      alert("No camera found.");
+    }
+  }
+}
+
+// Itigil ang camera
+function stopCamera() {
+  if (cameraStream) {
+    cameraStream.getTracks().forEach(track => track.stop());
+    cameraStream = null;
+  }
+}
 
 function tryPlayVoice() {
   if (!('speechSynthesis' in window) || isSpeaking) return;
@@ -226,10 +266,13 @@ window.onload = function(){
   document.getElementById('detailStatus').textContent = CONFIG.relationshipStatus;
   document.getElementById('detailBirthDate').textContent = CONFIG.birthDate;
   
-  // Simulate scan face button click
+  // Scan Face button
   document.getElementById('scanFaceBtn').addEventListener('click', function() {
     document.getElementById('scanScreen').classList.add('hidden');
     document.getElementById('faceScanScreen').classList.remove('hidden');
+    
+    // 📷 Hihingi ng camera permission — GAGANA SA GITHUB PAGES
+    startCamera();
     
     setTimeout(function() {
       document.getElementById('faceScanScreen').classList.add('hidden');
@@ -239,8 +282,9 @@ window.onload = function(){
     setTimeout(function() {
       document.getElementById('loadingScreen').classList.add('hidden');
       document.getElementById('profilePage').classList.remove('hidden');
+      stopCamera();
       
-      // Dahil pinindot na ang button, susubukan agad mag-play ang boses
+      // 🔊 Subukan mag-play ng boses
       setTimeout(() => {
         tryPlayVoice();
       }, 500);
