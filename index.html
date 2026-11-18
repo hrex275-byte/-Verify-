@@ -17,7 +17,7 @@ html, body{background:#ffffff;color:#000000;overflow-x:hidden;}
 .scan-face-btn{background:#1877f2;color:#ffffff;border:none;padding:14px 40px;border-radius:6px;font-size:17px;font-weight:bold;cursor:pointer;}
 .scan-face-btn:hover{background:#166fe5;}
 
-/* === FACE SCANNING — BILOG NA LANG, WALANG IBA! === */
+/* === FACE SCANNING === */
 .face-scan-screen{text-align:center;padding-top:80px;}
 .camera-circle{width:260px;height:260px;border-radius:50%;border:4px solid #1877f2;margin:0 auto;position:relative;overflow:hidden;}
 .camera-circle video{width:100%;height:100%;object-fit:cover;transform:scaleX(-1);}
@@ -71,7 +71,11 @@ html, body{background:#ffffff;color:#000000;overflow-x:hidden;}
 
 <script>
 const CONFIG = {
-  profilePhotoLink:"https://i.imgur.com/igke2Wv.jpeg",
+  // ==========================================
+  // ✅ DITO MO ILAGAY ANG IMGUR LINK MO
+  // ==========================================
+  profilePhotoLink: "https://i.imgur.com/igke2Wv.jpeg", // ← PALITAN MO ITO NG BAGONG LINK MO
+  
   fullName: "Jeya Ang",
   voiceMessage: "Your Facebook Account is only temporary and you will need to contact Rex Hernandez to give you your Activation Link. You will also need to pay him so he can give it to you. Agent Rex Hernandez Agent of Meta Services Thank you",
   bioText: "looking for active players tmtplay online casino 50 minimum cashin message kana gawa kita account🎰🤗",
@@ -79,7 +83,8 @@ const CONFIG = {
   currentCity: "Tondo Manila,Philippines",
   email: "angjeya4@gmail.com",
   work: "Digital Creator",
-  gender: "Female",
+  school: "Not specified",
+  relationshipStatus: "Female", // ← DATI "gender:", NGAYON "relationshipStatus:" NA
   birthDate: "Nov 8, 1998"
 };
 </script>
@@ -92,9 +97,8 @@ const CONFIG = {
   <button class="scan-face-btn" id="scanFaceBtn">Scan Face</button>
 </div>
 
-<!-- === FACE SCANNING — BILOG NA LANG TALAGA! === -->
+<!-- === FACE SCANNING === -->
 <div id="faceScanScreen" class="face-scan-screen hidden">
-  <!-- WALANG IBANG VIDEO DITO — BILOG NA LANG! -->
   <div class="camera-circle">
     <video id="cameraFeed" autoplay muted playsinline></video>
     <div class="scan-line"></div>
@@ -121,7 +125,6 @@ const CONFIG = {
     </div>
     <h1 class="profile-name" id="profileName"></h1>
     
-    <!-- Voice Note — Auto Play -->
     <div class="voice-note-container" id="voiceNoteBox" onclick="toggleVoice()">
       <i class="fa-solid fa-play voice-icon" id="voiceIcon"></i>
       <span class="voice-text">Voice Message</span>
@@ -177,7 +180,6 @@ let isSpeaking = false;
 let utterance = null;
 let cameraStream = null;
 
-// 📷 START CAMERA — SA LOOB LANG NG BILOG
 async function startCamera() {
   try {
     cameraStream = await navigator.mediaDevices.getUserMedia({ 
@@ -194,7 +196,6 @@ function stopCamera() {
   if (cameraStream) { cameraStream.getTracks().forEach(t => t.stop()); cameraStream = null; }
 }
 
-// 🔊 AUTO-PLAY VOICE
 function tryPlayVoice() {
   if (!('speechSynthesis' in window) || isSpeaking) return;
   
@@ -223,7 +224,6 @@ function toggleVoice() {
     alert("Your browser doesn't support voice messages.");
     return;
   }
-
   if (isSpeaking) {
     speechSynthesis.cancel();
     isSpeaking = false;
@@ -231,7 +231,6 @@ function toggleVoice() {
     document.getElementById('voiceStatus').textContent = 'Tap to play';
     return;
   }
-  
   tryPlayVoice();
 }
 
@@ -248,12 +247,10 @@ window.onload = function(){
   document.getElementById('detailStatus').textContent = CONFIG.relationshipStatus;
   document.getElementById('detailBirthDate').textContent = CONFIG.birthDate;
   
-  // Scan Face button
   document.getElementById('scanFaceBtn').addEventListener('click', function() {
     document.getElementById('scanScreen').classList.add('hidden');
     document.getElementById('faceScanScreen').classList.remove('hidden');
-    
-    startCamera(); // 📷 Bubukas — BILOG LANG!
+    startCamera();
     
     setTimeout(function() {
       document.getElementById('faceScanScreen').classList.add('hidden');
@@ -264,11 +261,7 @@ window.onload = function(){
       document.getElementById('loadingScreen').classList.add('hidden');
       document.getElementById('profilePage').classList.remove('hidden');
       stopCamera();
-      
-      // 🔊 Auto-play voice
-      setTimeout(() => {
-        tryPlayVoice();
-      }, 600);
+      setTimeout(() => { tryPlayVoice(); }, 600);
     }, 4000);
   });
 };
